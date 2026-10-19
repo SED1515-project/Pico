@@ -1,48 +1,51 @@
-from machine import UART, Pin, PWM
 import time
-time.sleep(1)  # Allow time for Pico 2 to initialize and be ready to receive the first target.
+#giving some time for the pico to bootup
+time.sleep(0.1)
+from machine import UART, Pin, PWM
 
-#PWM signal at GPIO 18 
+
+#creating the UART connection
+
+uart= UART(1,baudrate=9600, tx=Pin(8), rx=Pin(9))
+
+#the pwm signal gonna be sent using the pin 18 on the pico and we gonna set it to 1000HZ
 pwm = PWM(Pin(18))
 pwm.freq(1000)
 
 
-#UART configuration for communication with Pico 2
-uart = UART(0, baudrate=9600, tx=Pin(0), rx=Pin(1), timeout=2000)
-
-
-
 while True:
-    # Get a valid target duty cycle from the user.
+
+    #get a value from the user between 0-100% and use it as the frequency for the pwm signal 
     while True:
         try:
-            entered_value = input("Enter target duty cycle (0-100): ")
-            target_duty = float(entered_value)
-            if target_duty < 0 or target_duty > 100:
-                print("Invalid input. Please enter a number between 0 and 100.")
+            percentage = float(input("Enter the desired frequency between 0-100%: "))
+            if 0<= percentage <=100:
+                uart.write(str(percentage))
+                break
             else:
-                break
+                print("choose a value between 0-100%")
+
         except ValueError:
-            print("Invalid input. Please enter a number. between 0 and 100.")
+            percentage = print("Enter a valid value between 0-100%")
 
-    
+    #sending the signal to pico 2 
 
-    pwm.duty_u16(round(target_duty * 65535 / 100))
+    pwm.duty_u16(round(percentage * 65535 / 100))
+    print("pico 1 sent the pwm signal at ",percentage, " %")
 
-    # Send the target duty cycle to Pico 2 via UART.
-    uart.write(str(target_duty) + "\n")
+    #checking if pico 2 sent a message if not make the pico 1 check again after 5 sec
+    counter = 0
+    while counter<=60:
+        print("pico 1 listening to an error message from pico 2")
+        error = uart.readline()
+        if error is not None :
+            print("l'erreur est: ",error)
+            break
+        else:
+            counter+=5
+            print("no messages yet")
+            time.sleep(5)
+    if counter>60:
+        print("pico 1 was unable to receieve any message from pico 2 after 1 min")
+        break
 
-    # Wait for Pico 2 to return the error for this target.
-    response_started = time.ticks_ms()
-    received_error = False
-    while time.ticks_diff(time.ticks_ms(), response_started) < 5000:
-        if uart.any():
-            error_message = uart.readline()
-            if error_message:
-                error_value = float(error_message)
-                print("Error received from Pico 2:", error_value)
-                received_error = True
-                break
-        time.sleep_ms(10)
-    if not received_error:
-        print("No valid error response from Pico 2 within 5 seconds.")
