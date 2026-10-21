@@ -39,6 +39,7 @@ while True:
         print("pico 1 listening to an error message from pico 2")
         error = uart.readline()
         if error is not None :
+            error = float(uart.readline().decode().strip())
             print("l'erreur est: ",error)
             break
         else:
@@ -48,4 +49,3 @@ while True:
     if counter>60:
         print("pico 1 was unable to receieve any message from pico 2 after 1 min")
         break
-
