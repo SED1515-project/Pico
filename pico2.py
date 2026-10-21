@@ -5,14 +5,14 @@ time.sleep(0.1)
 from machine import UART, ADC, Pin
 
 
-uart = UART(1,baudrate=9600,tx = Pin(9), rx=Pin(8))
+uart = UART(1,baudrate=9600,tx = Pin(8), rx=Pin(9))
 
 while True:
    #checking the message was sent to the uart conection yet if not wait 5 sec before checking again
    while True:
       targetvalue=uart.readline()
       if targetvalue is not None:
-         print("received pico 1 desired value")
+         print("received pico 1 desired value: ",targetvalue)
          break
       else:
          time.sleep(5)   
@@ -35,4 +35,4 @@ while True:
 
    #sending it using uart to pico1
 
-   uart.write(error)
+   uart.write((str(error) + "\n").encode())
