@@ -36,3 +36,48 @@ while True:
    #sending it using uart to pico1
 
    uart.write((str(error) + "\n").encode())
+
+
+
+
+
+
+
+while True:
+    #demander a l'utilisateur un message a envoyer
+    timer = time.ticks_ms()
+    while True:
+        # while with timeout options
+        while time.ticks_ms() <= 10000:
+            envoyer=input("Entrer votre meessage: ")
+        # check if the message exist
+        if envoyer is not None:
+            uart.write(envoyer)
+            break
+        # send a status update to the other user
+        if timer>10000:
+            uart.write("maintien de connexion ")
+            
+        
+
+
+
+
+
+    #envoyer le message avec UART
+
+    uart.write(envoyer)
+
+    #recevoir 
+
+    while True:
+        recu = uart.read()
+        if recu is not None:
+            print(recu)
+            break
+        else:
+            time.sleep(10)
+
+    
+  
+
