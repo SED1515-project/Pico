@@ -1,39 +1,42 @@
 import time
-#giving time for pico2 to start
-time.sleep(0.1)
 
-from machine import UART, ADC, Pin
+# Allow time for Pico 1 to initialize and send the first target.
+time.sleep(1)
+
+from machine import ADC, Pin, UART
+  
 
 
-uart = UART(1,baudrate=9600,tx = Pin(8), rx=Pin(9))
+
+#UART configuration for communication with Pico 2
+uart = UART(1, baudrate=9600, tx=Pin(8), rx=Pin(9))
+
+
+# ADC for voltage measurement on GPIO 26
+adc = ADC(Pin(26))
 
 while True:
-   #checking the message was sent to the uart conection yet if not wait 5 sec before checking again
-   while True:
-      targetvalue=uart.readline()
-      if targetvalue is not None:
-         print("received pico 1 desired value: ",targetvalue)
-         break
-      else:
-         time.sleep(5)   
-         continue
+    # Read a target value from Pico 1 via UART.
+    message = None
 
-   # we initialize the pin that gonna read the signal
+    while message is None:
+        message = uart.readline()
 
-   adc= ADC(Pin(26))
+        if message is None:  
+             time.sleep_ms(10)   
 
-   #giving time for the ADC reader to fix at one value 
-   time.sleep_ms(500) 
+    target_duty = float(message.decode().strip())
 
+    # Let the RC-filtered PWM voltage settle before measuring.
+    time.sleep_ms(500)
 
-   #measure the signal in percentage
-   measured_signal= (adc.read_u16())*100 / 65535
+    # Measure the average voltage
+    measured_voltage = adc.read_u16() * 3.3 / 65535
+    
+    # Convert the voltage into a duty cycle percentage 
+    measured_duty = max(0.0, min(100.0, measured_voltage * 100 / 3.3))
 
-   #calculate the error:
-
-   error = float(targetvalue) - measured_signal
-
-   #sending it using uart to pico1
-
-   uart.write((str(error) + "\n").encode())
-
+    error = target_duty - measured_duty
+    print("Measured duty cycle:", measured_duty)
+    print("Error (target - measured):", error)
+    uart.write(str(error) + "\n")
