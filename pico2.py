@@ -26,6 +26,7 @@ while True:
              time.sleep_ms(10)   
 
     target_duty = float(message.decode().strip())
+    print("voici la valeur envoyer par pico 1 sur UART: ",target_duty)
 
     # Let the RC-filtered PWM voltage settle before measuring.
     time.sleep_ms(500)
@@ -40,3 +41,4 @@ while True:
     print("Measured duty cycle:", measured_duty)
     print("Error (target - measured):", error)
     uart.write(str(error) + "\n")
+
