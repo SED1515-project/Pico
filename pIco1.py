@@ -3,7 +3,7 @@ import time
 time.sleep(1)  # Allow time for Pico 2 to initialize and be ready to receive the first target.
 
 #PWM signal at GPIO 18 
-pwm = PWM(Pin(18))
+pwm = PWM(Pin(0))
 pwm.freq(1000)
 
 
@@ -39,7 +39,7 @@ while True:
 
     # start the timer to wait for the response from Pico 2
     start = time.ticks_ms() 
-    error_received = False
+    received_error = False
 
     # using interval of 5 seconds to wait for the response from Pico 2
     while time.ticks_diff(time.ticks_ms(), start) < 5000:
