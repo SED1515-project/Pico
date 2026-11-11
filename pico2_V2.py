@@ -30,5 +30,31 @@ def read_voltage():
   return raw * 0.002
 
 
+  # Mesurer ce qui s'echappe du filtre RC et renvoyer l'ecart a Pico1
 while True:
-  
+
+    #Verifier si le message duty_cycle envoye par Pico1 est correct:
+    while True:
+        message = (uart.readline())
+        if message:
+            break
+    target_duty = float(message.decode().strip())
+
+    # doing an average voltage after 50 measurement of the same 
+    total = 0
+
+    for i in range(50):
+
+        total += read_voltage()
+    
+    measured_voltage = total/50
+
+    #convert the voltage to a percentage of the duty cycle 
+    measured_duty = (measured_voltage / 3.3) / 100
+
+    # shows the amount of duty cycle lost in the process 
+    error = target_duty - measured_duty
+
+    #send the error to pico1
+    uart.write(str(error).encode())
+
