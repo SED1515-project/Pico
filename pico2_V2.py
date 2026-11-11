@@ -40,7 +40,7 @@ while True:
             break
     target_duty = float(message.decode().strip())
 
-    # doing an average voltage after 50 measurement of the same 
+    # Faire la moyenne en voltage de 50 mesures 
     total = 0
 
     for i in range(50):
@@ -49,12 +49,12 @@ while True:
     
     measured_voltage = total/50
 
-    #convert the voltage to a percentage of the duty cycle 
+    #convertir le voltage a un pourcentage du duty cycle  
     measured_duty = (measured_voltage / 3.3) / 100
 
-    # shows the amount of duty cycle lost in the process 
+    # montrer la quantite perdue de duty cycle dans le processus 
     error = target_duty - measured_duty
 
-    #send the error to pico1
+    #envoyer l'erreur a pico 1
     uart.write(str(error).encode())
 
