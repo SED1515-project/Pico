@@ -30,9 +30,11 @@ def read_voltage():
     #Extract 12 bit ADC value 
     raw = ((data[0] << 8) | data[1]) >> 4
 
+    # Gestion du signe (complément à 2)
     if raw & 0x800:
-        raw-=4096
-
+        raw = raw - 4096
+        
+    # Conversion en tension : 1 LSB = 2 mV avec gain ±4.096V
     return raw * 0.002
 
 
