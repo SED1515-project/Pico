@@ -58,7 +58,7 @@ while True:
     measured_voltage = total/50
 
     #convert the voltage to a percentage of the duty cycle 
-    measured_duty = (measured_voltage / 3.3) / 100
+    measured_duty = (measured_voltage / 3.3) * 100
 
     # shows the amount of duty cycle lost in the process 
     error = target_duty - measured_duty
