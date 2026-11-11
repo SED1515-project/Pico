@@ -45,12 +45,15 @@ while True:
 
     for i in range(50):
 
+        #attendre 100 millisecondes avant de lire le voltage
+        time.sleep_ms(100)
+
         total += read_voltage()
     
     measured_voltage = total/50
 
     #convertir le voltage a un pourcentage du duty cycle  
-    measured_duty = (measured_voltage / 3.3) / 100
+    measured_duty = (measured_voltage / 3.3) * 100
 
     # montrer la quantite perdue de duty cycle dans le processus 
     error = target_duty - measured_duty
