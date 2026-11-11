@@ -52,7 +52,10 @@ while True:
     total = 0
 
     for i in range(50):
-
+        
+        #wait 100 milliseconds before reading the voltage
+        time.sleep_ms(100)
+        
         total += read_voltage()
     
     measured_voltage = total/50
